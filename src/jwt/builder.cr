@@ -18,15 +18,19 @@ module Jwt
     getter headers
     getter payload
 
-    def initialize
+    property expiry_window
+
+    def initialize(@current_time : Time = Time.now, @expiry_window : Time::Span = 1.hour)
       @headers = Hash(String, JSON::Type).new
       @payload = Hash(String, JSON::Type).new
       @algorithm = "none"
     end
 
-    private def set_payload_claim(claim : String, value : (Time | Nil))
+    private def set_payload_claim(claim : String, value : (Time | Nil), fallback : Time)
       if !value.nil?
         @payload[claim] = value.epoch
+      else
+        @payload[claim] = fallback.epoch
       end
     end
 
@@ -53,9 +57,11 @@ module Jwt
       set_payload_claim "iss", @issuer
       set_payload_claim "sub", @subject
       set_payload_claim "aud", @audience
-      set_payload_claim "exp", @expires_at
-      set_payload_claim "nbf", @not_before
-      set_payload_claim "iat", @issued_at
+
+      set_payload_claim "exp", @expires_at, @current_time + @expiry_window
+      set_payload_claim "nbf", @not_before, @current_time
+      set_payload_claim "iat", @issued_at, @current_time
+
       set_payload_claim "jti", @jwt_id
 
       Jwt::Token.new @headers, @payload
