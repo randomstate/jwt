@@ -24,16 +24,12 @@ module Jwt
       custom(key, :payload, &block)
     end
 
-    def custom(key : String, part : Symbol = :payload, &block)
+    def custom(key : String, part : Symbol = :payload, &block : JSON::Type -> Bool)
       case part
       when :header
-        @custom_headers[key] = ->(value : JSON::Type) {
-          yield
-        }
+        @custom_headers[key] = block
       else
-        @custom[key] = ->(value : JSON::Type) {
-          yield
-        }
+        @custom[key] = block
       end
     end
 
@@ -58,7 +54,17 @@ module Jwt
         raise ValidationError.new "'Issued at' time has not yet passed." unless Time.epoch(token.payload["iat"].as(Int64)) < @current_time
 
         # validate custom headers
+        @custom_headers.each do |key, validator|
+          header_value = token.headers[key]
+          raise ValidationError.new "Validation failed for header #{key}" unless validator.call(header_value.as(JSON::Type))
+        end
+
         # validate custom payload
+        @custom.each do |key, validator|
+          payload_value = token.payload[key]
+          raise ValidationError.new "Validation failed for payload claim #{key}" unless validator.call(payload_value.as(JSON::Type))
+        end
+
         true
       rescue error : ValidationError
         unless !with_exceptions?

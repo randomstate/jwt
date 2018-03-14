@@ -77,6 +77,44 @@ describe Jwt::Validator do
     validator.current_time = Time.now
     validator.validate(skewed_token).should be_false
   end
-  it "can validate custom header or payload claims using callbacks" do
+
+  it "can validate custom payload claims using callbacks" do
+    validator = Jwt::Validator.new
+    builder = get_builder
+    token = builder.generate
+
+    token.payload["email"] = "john@example.com"
+
+    validator.custom "email" do |value|
+      next(value == "email")
+    end
+
+    validator.validate(token).should be_false
+
+    validator.custom "email" do |value|
+      next(value == "john@example.com")
+    end
+
+    validator.validate(token).should be_true
+  end
+
+  it "can validate custom header claims using callbacks" do
+    validator = Jwt::Validator.new
+    builder = get_builder
+    token = builder.generate
+
+    token.headers["email"] = "john@example.com"
+
+    validator.custom "email", :header do |value|
+      next(value == "email")
+    end
+
+    validator.validate(token).should be_false
+
+    validator.custom "email", :header do |value|
+      next(value == "john@example.com")
+    end
+
+    validator.validate(token).should be_true
   end
 end
