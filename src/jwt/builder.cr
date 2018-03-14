@@ -1,4 +1,4 @@
-module Jwt
+module JWT
   class Builder
     # Headers
     property type : (String | Nil) = "JWT"
@@ -64,7 +64,7 @@ module Jwt
 
       set_payload_claim "jti", @jwt_id
 
-      Jwt::Token.new @headers, @payload
+      JWT::Token.new @headers, @payload
     end
   end
 end

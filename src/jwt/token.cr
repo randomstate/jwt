@@ -2,7 +2,7 @@ require "openssl_ext"
 require "json"
 require "../jwt"
 
-module Jwt
+module JWT
   class Token
     getter headers
     getter payload
@@ -11,7 +11,7 @@ module Jwt
     def initialize(@headers : Hash(String, JSON::Type), @payload : Hash(String, JSON::Type), @signature : (Slice(UInt8) | Nil) = nil)
     end
 
-    def encode(io : IO, key : OpenSSL::RSA, algorithm : Jwt::Algorithm)
+    def encode(io : IO, key : OpenSSL::RSA, algorithm : JWT::Algorithm)
       encode io
 
       signature = ""
@@ -26,7 +26,7 @@ module Jwt
       io << '.' << signature
     end
 
-    def encode(key : OpenSSL::RSA, algorithm : Jwt::Algorithm)
+    def encode(key : OpenSSL::RSA, algorithm : JWT::Algorithm)
       io = IO::Memory.new
       encode(io, key, algorithm)
       io.to_s
@@ -48,7 +48,7 @@ module Jwt
     def self.decode(token : String)
       parts = token.split('.')
 
-      raise JwtError.new "Invalid JWT Token. Must have at least two parts." unless (parts.size >= 2 && parts.size <= 3)
+      raise JWTError.new "Invalid JWT Token. Must have at least two parts." unless (parts.size >= 2 && parts.size <= 3)
 
       headers = decode_part_to_json(parts.shift)
       payload = decode_part_to_json(parts.shift)
@@ -62,11 +62,11 @@ module Jwt
     end
 
     private def self.decode_part_to_json(b64_string : String)
-      raise JwtError.new "Invalid JSON in #{b64_string}" unless json = JSON.parse(Base64.decode_string(b64_string)).as_h
+      raise JWTError.new "Invalid JSON in #{b64_string}" unless json = JSON.parse(Base64.decode_string(b64_string)).as_h
       json
     end
 
-    private def digest(name : Jwt::Algorithm) : (OpenSSL::Digest | Nil)
+    private def digest(name : JWT::Algorithm) : (OpenSSL::Digest | Nil)
       algo = case name
              when Algorithm::RS256
                "sha256"

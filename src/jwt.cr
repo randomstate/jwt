@@ -1,6 +1,6 @@
 require "./jwt/*"
 
-module Jwt
-  class JwtError < Exception
+module JWT
+  class JWTError < Exception
   end
 end

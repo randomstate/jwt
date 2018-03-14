@@ -1,4 +1,4 @@
-module Jwt
+module JWT
   enum Algorithm
     RS256
   end

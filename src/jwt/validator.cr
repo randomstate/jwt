@@ -1,4 +1,4 @@
-module Jwt
+module JWT
   class ValidationError < Exception
   end
 
@@ -8,6 +8,7 @@ module Jwt
     property issuer : (String | Nil)
     property audience : (String | Nil)
     property subject : (String | Nil)
+    property jwt_id : (String | Nil)
 
     def initialize(current_time : (Time | Nil) = nil)
       if current_time.nil?
@@ -47,6 +48,7 @@ module Jwt
         validate_payload_claim(@issuer, "iss", token)
         validate_payload_claim(@audience, "aud", token)
         validate_payload_claim(@subject, "sub", token)
+        validate_payload_claim(@jwt_id, "jti", token)
 
         # validate time
         raise ValidationError.new "'Expires at' time has passed." unless Time.epoch(token.payload["exp"].as(Int64)) > @current_time

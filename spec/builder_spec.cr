@@ -1,8 +1,8 @@
 require "./spec_helper"
 
-describe Jwt::Builder do
+describe JWT::Builder do
   it "can create a jwt token" do
-    builder = Jwt::Builder.new
+    builder = JWT::Builder.new
 
     builder.issuer = "me"
     builder.subject = "subject"
@@ -19,7 +19,7 @@ describe Jwt::Builder do
   end
 
   it "does not add optional nil claims and headers" do
-    builder = Jwt::Builder.new
+    builder = JWT::Builder.new
 
     builder.issuer = nil
     builder.subject = "subject"

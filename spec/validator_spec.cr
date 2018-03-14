@@ -1,20 +1,22 @@
 require "./spec_helper"
 
-validator = Jwt::Validator.new
+validator = JWT::Validator.new
 validator.issuer = "me"
 validator.audience = "also me"
 validator.subject = "what do you know, me"
+validator.jwt_id = "1234"
 
 def get_builder
-  builder = Jwt::Builder.new
+  builder = JWT::Builder.new
   builder.issuer = "me"
   builder.audience = "also me"
   builder.subject = "what do you know, me"
+  builder.jwt_id = "1234"
 
   builder
 end
 
-describe Jwt::Validator do
+describe JWT::Validator do
   it "can validate a valid jwt token" do
     valid = get_builder.generate
     validator.validate(valid).should be_true
@@ -78,8 +80,15 @@ describe Jwt::Validator do
     validator.validate(skewed_token).should be_false
   end
 
+  it "can check against jwt unique ID" do
+    builder = get_builder
+    builder.jwt_id = "also not me"
+    invalid_id = builder.generate
+    validator.validate(invalid_id).should be_false
+  end
+
   it "can validate custom payload claims using callbacks" do
-    validator = Jwt::Validator.new
+    validator = JWT::Validator.new
     builder = get_builder
     token = builder.generate
 
@@ -99,7 +108,7 @@ describe Jwt::Validator do
   end
 
   it "can validate custom header claims using callbacks" do
-    validator = Jwt::Validator.new
+    validator = JWT::Validator.new
     builder = get_builder
     token = builder.generate
 
