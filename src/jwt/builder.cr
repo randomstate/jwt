@@ -16,41 +16,49 @@ module Jwt
 
     # Custom
     getter headers
-    getter claims
+    getter payload
 
     def initialize
       @headers = Hash(String, JSON::Type).new
-      @claims = Hash(String, JSON::Type).new
+      @payload = Hash(String, JSON::Type).new
       @algorithm = "none"
     end
 
-    private def set_claim(claim : String, value : (Time | Nil))
+    private def set_payload_claim(claim : String, value : (Time | Nil))
       if !value.nil?
-        @claims[claim] = value.epoch
+        @payload[claim] = value.epoch
       end
     end
 
-    private def set_claim(claim : String, value : (String | Nil))
+    private def set_payload_claim(claim : String, value : (String | Nil))
       if !value.nil?
-        @claims[claim] = value
+        @payload[claim] = value
       end
+    end
+
+    private def set_claim_on(claim : String, value : (String | Nil), on : Hash(String, JSON::Type))
+      if !value.nil?
+        on[claim] = value
+      end
+    end
+
+    private def set_header(claim : String, value : (String | Nil))
+      set_claim_on claim, value, @headers
     end
 
     def generate
-      @headers["typ"] = @type
-      @headers["cty"] = @content_type
+      set_header "typ", @type
+      set_header "cty", @content_type
 
-      set_claim "iss", @issuer
-      set_claim "sub", @subject
-      set_claim "aud", @audience
+      set_payload_claim "iss", @issuer
+      set_payload_claim "sub", @subject
+      set_payload_claim "aud", @audience
+      set_payload_claim "exp", @expires_at
+      set_payload_claim "nbf", @not_before
+      set_payload_claim "iat", @issued_at
+      set_payload_claim "jti", @jwt_id
 
-      set_claim "exp", @expires_at
-      set_claim "nbf", @not_before
-      set_claim "iat", @issued_at
-
-      @claims["jti"] = @jwt_id
-
-      Jwt::Token.new @headers, @claims
+      Jwt::Token.new @headers, @payload
     end
   end
 end

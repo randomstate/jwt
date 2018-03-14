@@ -11,7 +11,7 @@ describe Jwt::Builder do
     builder.not_before = Time.now
     builder.issued_at = Time.now
 
-    builder.claims["name"] = "John Doe"
+    builder.payload["name"] = "John Doe"
 
     token = builder.generate
 
