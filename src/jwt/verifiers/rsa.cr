@@ -7,7 +7,7 @@ module JWT::Verifier
         return false
       end
 
-      unencrypted = token.encode
+      unencrypted = "#{token.headers64}.#{token.payload64}"
       digest = Token.get_digest_for(algorithm)
 
       if digest.nil?
