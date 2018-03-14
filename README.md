@@ -62,7 +62,7 @@ validator.validate(token) # Returns true or false
 validator.validate(token, true) # true or raises an exception because in strict mode - this will supply a reason for the failure
 ```
 
-### Verifying a Token using an RSA Algorithm
+### Verifying a Token using an RSA Algorithm
 
 ```crystal
 jwt = JWT::Token.decode("eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJleHAiOjE1MjEwNjI1MjMsIm5iZiI6MTUyMTA1ODkyMywiaWF0IjoxNTIxMDU4OTIzLCJlbWFpbCI6ImpvaG5AZXhhbXBsZS5jb20ifQ==.MhN4Yiq5Ivevp-XHmPUdecpLWuRu2-IcgMHHfj7hR_VXQtIPqe54uuSwd2")
