@@ -68,7 +68,7 @@ validator.validate(token, true) # true or raises an exception because in strict 
 jwt = JWT::Token.decode("eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJleHAiOjE1MjEwNjI1MjMsIm5iZiI6MTUyMTA1ODkyMywiaWF0IjoxNTIxMDU4OTIzLCJlbWFpbCI6ImpvaG5AZXhhbXBsZS5jb20ifQ==.MhN4Yiq5Ivevp-XHmPUdecpLWuRu2-IcgMHHfj7hR_VXQtIPqe54uuSwd2")
 
 pem = "-----BEGIN RSA PUBLIC KEY----- #..."
-rsa = OpenSSL::RSA(pem, true)
+rsa = OpenSSL::RSA.new(pem, true)
 
 JWT::Verifier::RSA.verify(token, rsa, JWT::Algorithm::RS256)
 
