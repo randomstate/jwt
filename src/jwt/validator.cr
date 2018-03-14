@@ -51,9 +51,17 @@ module JWT
         validate_payload_claim(@jwt_id, "jti", token)
 
         # validate time
-        raise ValidationError.new "'Expires at' time has passed." unless Time.epoch(token.payload["exp"].as(Int64)) > @current_time
-        raise ValidationError.new "'Not before' time has not yet passed." unless Time.epoch(token.payload["nbf"].as(Int64)) < @current_time
-        raise ValidationError.new "'Issued at' time has not yet passed." unless Time.epoch(token.payload["iat"].as(Int64)) < @current_time
+        if token.payload.has_key? "exp"
+          raise ValidationError.new "'Expires at' time has passed." unless Time.epoch(token.payload["exp"].as(Int64)) > @current_time
+        end
+
+        if token.payload.has_key? "nbf"
+          raise ValidationError.new "'Not before' time has not yet passed." unless Time.epoch(token.payload["nbf"].as(Int64)) < @current_time
+        end
+
+        if token.payload.has_key? "iat"
+          raise ValidationError.new "'Issued at' time has not yet passed." unless Time.epoch(token.payload["iat"].as(Int64)) < @current_time
+        end
 
         # validate custom headers
         @custom_headers.each do |key, validator|

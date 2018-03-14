@@ -71,7 +71,9 @@ module JWT
       new(headers, payload, signature).tap do |token|
         token.headers64 = parts[0]
         token.payload64 = parts[1]
-        token.signature64 = parts[2]
+        unless signature.nil?
+          token.signature64 = parts[2]
+        end
       end
     end
 
