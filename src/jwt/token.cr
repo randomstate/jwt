@@ -8,6 +8,10 @@ module JWT
     getter payload
     getter signature : Slice(UInt8)
 
+    property headers64 : String = ""
+    property payload64 : String = ""
+    property signature64 : String = ""
+
     def initialize(@headers : Hash(String, JSON::Type), @payload : Hash(String, JSON::Type), signature : (Slice(UInt8) | Nil) = nil)
       @signature = encode.to_slice
 
@@ -41,7 +45,7 @@ module JWT
     def encode(io : IO)
       headers_part = @headers.to_json
       payload_part = @payload.to_json
-
+      puts headers_part, payload_part
       io << Base64.urlsafe_encode(headers_part) << '.' << Base64.urlsafe_encode(payload_part)
     end
 
@@ -56,15 +60,19 @@ module JWT
 
       raise JWTError.new "Invalid JWT Token. Must have at least two parts." unless (parts.size >= 2 && parts.size <= 3)
 
-      headers = decode_part_to_json(parts.shift)
-      payload = decode_part_to_json(parts.shift)
+      headers = decode_part_to_json(parts[0])
+      payload = decode_part_to_json(parts[1])
 
       signature = nil
-      if parts.size == 1
-        signature = Base64.decode(parts.shift)
+      if parts.size > 2
+        signature = Base64.decode(parts[2])
       end
 
-      new(headers, payload, signature)
+      new(headers, payload, signature).tap do |token|
+        token.headers64 = parts[0]
+        token.payload64 = parts[1]
+        token.signature64 = parts[2]
+      end
     end
 
     def self.get_digest_for(name : JWT::Algorithm)
