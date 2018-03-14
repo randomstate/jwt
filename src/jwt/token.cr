@@ -45,7 +45,7 @@ module JWT
     def encode(io : IO)
       headers_part = @headers.to_json
       payload_part = @payload.to_json
-      puts headers_part, payload_part
+
       io << Base64.urlsafe_encode(headers_part) << '.' << Base64.urlsafe_encode(payload_part)
     end
 
