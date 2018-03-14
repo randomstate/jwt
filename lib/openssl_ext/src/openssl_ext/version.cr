@@ -1,3 +1,3 @@
-module JWT
+module OpensslRsa
   VERSION = "0.1.0"
 end

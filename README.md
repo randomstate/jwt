@@ -22,11 +22,57 @@ dependencies:
 require "jwt"
 ```
 
-TODO: Write usage instructions here
+### Generating a Token
 
-## Development
+```crystal
+builder = JWT::Builder.new
+builder.issuer = "me"
+builder.subject = "subject"
+builder.audience = "my-app"
 
-TODO: Write development instructions here
+builder.header["src"] = "multisite-1"
+builder.payload["username"] = "flyingkitty2019"
+
+jwt = builder.generate
+```
+
+### Decoding a Token
+
+```crystal
+jwt = JWT::Token.decode("eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJleHAiOjE1MjEwNjI1MjMsIm5iZiI6MTUyMTA1ODkyMywiaWF0IjoxNTIxMDU4OTIzLCJlbWFpbCI6ImpvaG5AZXhhbXBsZS5jb20ifQ==.MhN4Yiq5Ivevp-XHmPUdecpLWuRu2-IcgMHHfj7hR_VXQtIPqe54uuSwd2")
+
+issuer = jwt.headers["iss"]
+username = jwt.payload["username"]
+# etc
+```
+
+### Validating Token Claims
+
+```crystal
+jwt = JWT::Token.decode("eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJleHAiOjE1MjEwNjI1MjMsIm5iZiI6MTUyMTA1ODkyMywiaWF0IjoxNTIxMDU4OTIzLCJlbWFpbCI6ImpvaG5AZXhhbXBsZS5jb20ifQ==.MhN4Yiq5Ivevp-XHmPUdecpLWuRu2-IcgMHHfj7hR_VXQtIPqe54uuSwd2")
+
+
+validator = JWT::Validator.new
+validator.issuer = "must be me"
+validator.custom "username" do | username |
+  next(username == "the_only_allowed_username")
+end
+
+validator.validate(token) # Returns true or false
+validator.validate(token, true) # true or raises an exception because in strict mode - this will supply a reason for the failure
+```
+
+### Verifying a Token using an RSA Algorithm
+
+```crystal
+jwt = JWT::Token.decode("eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJleHAiOjE1MjEwNjI1MjMsIm5iZiI6MTUyMTA1ODkyMywiaWF0IjoxNTIxMDU4OTIzLCJlbWFpbCI6ImpvaG5AZXhhbXBsZS5jb20ifQ==.MhN4Yiq5Ivevp-XHmPUdecpLWuRu2-IcgMHHfj7hR_VXQtIPqe54uuSwd2")
+
+pem = "-----BEGIN RSA PUBLIC KEY----- #..."
+rsa = OpenSSL::RSA.new(pem, true)
+
+JWT::Verifier::RSA.verify(token, rsa, JWT::Algorithm::RS256)
+
+```
 
 ## Contributing
 

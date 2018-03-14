@@ -1,6 +1,7 @@
 require "./jwt/*"
+require "./jwt/verifiers/*"
 
-# TODO: Write documentation for `Jwt`
-module Jwt
-  # TODO: Put your code here
+module JWT
+  class JWTError < Exception
+  end
 end
