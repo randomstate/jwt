@@ -1,10 +1,8 @@
 require "openssl_ext"
 require "json"
+require "../jwt"
 
 module Jwt
-  class JwtError < Exception
-  end
-
   class Token
     getter headers
     getter payload
@@ -82,9 +80,5 @@ module Jwt
 
       OpenSSL::Digest.new algo
     end
-  end
-
-  enum Algorithm
-    RS256
   end
 end

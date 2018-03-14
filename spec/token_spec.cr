@@ -43,6 +43,7 @@ describe Jwt::Token do
   end
 
   it "can verify token signature" do
+    # jwt =
   end
 
   it "can verify token claims" do

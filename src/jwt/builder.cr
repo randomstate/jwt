@@ -24,9 +24,15 @@ module Jwt
       @algorithm = "none"
     end
 
-    private def set_time_claim(claim : String, value : (Time | Nil))
+    private def set_claim(claim : String, value : (Time | Nil))
       if !value.nil?
         @claims[claim] = value.epoch
+      end
+    end
+
+    private def set_claim(claim : String, value : (String | Nil))
+      if !value.nil?
+        @claims[claim] = value
       end
     end
 
@@ -34,13 +40,13 @@ module Jwt
       @headers["typ"] = @type
       @headers["cty"] = @content_type
 
-      @claims["iss"] = @issuer
-      @claims["sub"] = @subject
-      @claims["aud"] = @audience
+      set_claim "iss", @issuer
+      set_claim "sub", @subject
+      set_claim "aud", @audience
 
-      set_time_claim "exp", @expires_at
-      set_time_claim "nbf", @not_before
-      set_time_claim "iat", @issued_at
+      set_claim "exp", @expires_at
+      set_claim "nbf", @not_before
+      set_claim "iat", @issued_at
 
       @claims["jti"] = @jwt_id
 
