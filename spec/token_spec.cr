@@ -41,11 +41,4 @@ describe JWT::Token do
     decoded_jwt = JWT::Token.decode(token)
     decoded_jwt.headers["alg"].should eq "RS256"
   end
-
-  it "can verify token signature" do
-    # jwt =
-  end
-
-  it "can verify token claims" do
-  end
 end
